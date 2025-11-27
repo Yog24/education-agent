@@ -1,17 +1,21 @@
-import { Agent, Message } from '@/types';
+import { Agent, Message, Attachment } from '@/types';
 
 export interface AgentService {
-  sendMessage(agentId: string, content: string, history: Message[]): Promise<string>;
+  sendMessage(agentId: string, content: string, history: Message[], attachments?: Attachment[]): Promise<string>;
   getHistory(agentId: string): Promise<Message[]>;
   generateTitle(content: string): Promise<string>;
 }
 
 // Mock Service Implementation
 export class MockAgentService implements AgentService {
-  async sendMessage(agentId: string, content: string, history: Message[]): Promise<string> {
+  async sendMessage(agentId: string, content: string, history: Message[], attachments?: Attachment[]): Promise<string> {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
+    if (attachments && attachments.length > 0) {
+        return `收到您的${attachments.length}个文件（${attachments[0].name}等）。目前我还在学习如何处理它们，请先用文字描述您的需求。`;
+    }
+
     const responses: Record<string, string[]> = {
       keqian: [
         "根据您提供的学情数据，建议在备课中增加针对基础薄弱学生的互动环节。",
@@ -47,12 +51,16 @@ export class MockAgentService implements AgentService {
 // Real API Service Implementation (DeepSeek via Next.js Proxy)
 export class ApiAgentService implements AgentService {
   
-  async sendMessage(agentId: string, content: string, history: Message[]): Promise<string> {
+  async sendMessage(agentId: string, content: string, history: Message[], attachments?: Attachment[]): Promise<string> {
     try {
+        // Note: Current DeepSeek API implementation might not support attachments directly.
+        // We pass them in payload but they might be ignored by the current route handler
+        // or need to be converted to text context.
+        
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ agentId, content, history })
+            body: JSON.stringify({ agentId, content, history, attachments })
         });
 
         if (!response.ok) {
@@ -100,4 +108,3 @@ export default function getAgentService(): AgentService {
   }
   return instance;
 }
-
