@@ -25,10 +25,10 @@ export const AgentCard = ({ agent, isSelected, onClick }: AgentCardProps) => {
     <div 
       onClick={onClick}
       className={cn(
-        "relative p-5 rounded-xl border transition-all cursor-pointer group overflow-hidden flex flex-col h-full",
+        "relative p-6 rounded-2xl border transition-all cursor-pointer group overflow-hidden flex flex-col h-[220px]",
         isSelected 
           ? "bg-white border-purple-400 shadow-md ring-1 ring-purple-200" 
-          : "bg-white/40 border-white/50 hover:bg-white/60 hover:border-purple-200 hover:shadow-sm"
+          : "bg-white/40 border-white/50 hover:bg-white/60 hover:border-purple-200 hover:shadow-lg hover:-translate-y-1"
       )}
     >
       <div className={cn(

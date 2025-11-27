@@ -25,7 +25,7 @@ export const InputArea = ({ onSend, disabled, placeholder = "输入消息..." }:
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       handleSend();
     }
@@ -55,6 +55,9 @@ export const InputArea = ({ onSend, disabled, placeholder = "输入消息..." }:
         />
 
         <div className="absolute right-2 bottom-2 flex items-center gap-1">
+             <span className="text-xs text-gray-400 mr-2 hidden md:inline-block">
+                Ctrl + Enter 发送
+             </span>
              <button 
                 onClick={handleAttachmentClick}
                 className="p-2 text-gray-400 hover:text-purple-600 transition-colors"
@@ -73,6 +76,7 @@ export const InputArea = ({ onSend, disabled, placeholder = "输入消息..." }:
                 onClick={handleSend}
                 disabled={!input.trim() || disabled}
                 className="p-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all ml-1"
+                title="发送消息 (Ctrl + Enter)"
             >
                 <Send size={18} />
             </button>

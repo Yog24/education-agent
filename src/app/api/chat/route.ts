@@ -18,13 +18,13 @@ export async function POST(request: Request) {
     
     switch (agentId) {
         case 'keqian':
-            systemPrompt += "你的专长是课前循证。请重点从学情数据分析、教学目标制定、备课策略优化等方面提供建议。";
+            systemPrompt += "你的专长是课前循证。请重点从学情数据分析、课标分析、教材分析、教学目标制定、备课策略优化等方面提供建议。";
             break;
         case 'kezhong':
             systemPrompt += "你的专长是课中循证。请重点关注课堂观察、师生互动分析、教学行为记录等方面。";
             break;
         case 'kehou':
-            systemPrompt += "你的专长是课后循证。请重点进行教学评价、反思复盘、学生成效分析。";
+            systemPrompt += "你的专长是课后循证。请重点进行学生结果性评价和过程评价分析。";
             break;
         case 'data_analysis':
             systemPrompt += "你负责协助处理教研数据。";
@@ -73,5 +73,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
 
 

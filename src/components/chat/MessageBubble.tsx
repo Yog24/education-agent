@@ -34,7 +34,7 @@ export const MessageBubble = ({ message, animate = false }: MessageBubbleProps) 
         ) : animate ? (
             <Typewriter 
                 text={message.content} 
-                speed={20} 
+                speed={5} 
                 // Custom renderer for the typed text
                 render={(text) => <MarkdownRenderer content={text} />}
             />

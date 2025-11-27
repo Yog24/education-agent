@@ -66,25 +66,21 @@ export default function Home() {
         <div className="z-20 bg-gradient-to-t from-white/80 to-transparent">
           
            {/* Show Agent Grid only if no messages AND not in data analysis mode (unless we want to allow switching back) */}
-           {/* Actually, we want to show grid if NO agent selected OR if we are in initial state. 
-               But once an agent is selected, the grid usually disappears in this UI flow? 
-               Wait, previous code: `!hasMessages && <AgentGrid />`. 
-               If we select Data Analysis, hasMessages is empty (it's a tool, not a chat). 
-               So we need to hide grid if Data Analysis is selected too.
-           */}
            {!hasMessages && selectedAgent?.id !== 'data_analysis' && (
-             <div className="pb-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+             <div className="absolute inset-0 top-0 bottom-20 z-0 overflow-y-auto animate-in fade-in duration-500">
                <AgentGrid />
              </div>
            )}
 
            {/* Input Area - Hide for Data Analysis */}
            {selectedAgent?.id !== 'data_analysis' && (
-             <InputArea 
-               onSend={sendMessage} 
-               disabled={isLoading}
-               placeholder={selectedAgent ? `与 ${selectedAgent.name} 对话...` : "输入消息..."}
-             />
+             <div className="relative z-10 pb-4">
+                <InputArea 
+                  onSend={sendMessage} 
+                  disabled={isLoading}
+                  placeholder={selectedAgent ? `与 ${selectedAgent.name} 对话...` : "输入消息..."}
+                />
+             </div>
            )}
         </div>
 
