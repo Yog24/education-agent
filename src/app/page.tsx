@@ -1,65 +1,95 @@
-import Image from "next/image";
+"use client";
+
+import React, { useEffect } from 'react';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { ChatArea } from '@/components/chat/ChatArea';
+import { InputArea } from '@/components/chat/InputArea';
+import { AgentGrid } from '@/components/agents/AgentGrid';
+import { useAgentStore } from '@/store/useAgentStore';
+import { useChat } from '@/hooks/useChat';
+import { DataAnalysisModule } from '@/components/modules/DataAnalysisModule';
+import { Bot, Sparkles } from 'lucide-react';
 
 export default function Home() {
+  const { selectedAgent, messages, setSelectedAgent } = useAgentStore();
+  const { sendMessage, isLoading } = useChat();
+
+  // Optional: Reset state on mount?
+  // useEffect(() => {
+  //   // setSelectedAgent(MOCK_AGENTS[0]);
+  // }, []);
+
+  const hasMessages = messages.length > 0;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <MainLayout>
+      {/* Header / Top Bar */}
+      <div className="h-14 px-6 border-b border-white/40 flex items-center justify-between bg-white/30 backdrop-blur-sm z-10">
+        <div className="flex items-center gap-2">
+           {selectedAgent ? (
+             <>
+              <div className={`w-2 h-2 rounded-full bg-gradient-to-r ${selectedAgent.gradient}`} />
+              <span className="font-semibold text-gray-700">{selectedAgent.name}</span>
+              <span className="text-xs text-gray-400 px-2 py-0.5 bg-white/50 rounded-full border border-white/60">智能体</span>
+             </>
+           ) : (
+             <span className="font-semibold text-gray-700">请选择智能体</span>
+           )}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <div className="text-xs text-gray-400 flex items-center gap-1">
+           <Sparkles size={12} />
+           <span>湖畔小学·教研大模型 | 继续提问</span>
         </div>
-      </main>
-    </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 flex flex-col overflow-hidden relative">
+        
+        {/* Chat Area - Takes available space */}
+        <div className="flex-1 overflow-hidden flex flex-col">
+           {/* Special Handling for Data Analysis Module */}
+           {selectedAgent?.id === 'data_analysis' ? (
+             <div className="flex-1 h-full overflow-hidden animate-in fade-in duration-300">
+                <DataAnalysisModule />
+             </div>
+           ) : hasMessages || isLoading ? (
+             <ChatArea messages={messages} isLoading={isLoading} />
+           ) : (
+             <div className="flex-1 flex items-center justify-center p-8 text-center text-gray-500">
+                {/* Placeholder content if needed, or just empty space for the grid to shine */}
+             </div>
+           )}
+        </div>
+
+        {/* Bottom Section: Grid + Input */}
+        {/* Hide Input Area for Data Analysis Module */}
+        <div className="z-20 bg-gradient-to-t from-white/80 to-transparent">
+          
+           {/* Show Agent Grid only if no messages AND not in data analysis mode (unless we want to allow switching back) */}
+           {/* Actually, we want to show grid if NO agent selected OR if we are in initial state. 
+               But once an agent is selected, the grid usually disappears in this UI flow? 
+               Wait, previous code: `!hasMessages && <AgentGrid />`. 
+               If we select Data Analysis, hasMessages is empty (it's a tool, not a chat). 
+               So we need to hide grid if Data Analysis is selected too.
+           */}
+           {!hasMessages && selectedAgent?.id !== 'data_analysis' && (
+             <div className="pb-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <AgentGrid />
+             </div>
+           )}
+
+           {/* Input Area - Hide for Data Analysis */}
+           {selectedAgent?.id !== 'data_analysis' && (
+             <InputArea 
+               onSend={sendMessage} 
+               disabled={isLoading}
+               placeholder={selectedAgent ? `与 ${selectedAgent.name} 对话...` : "输入消息..."}
+             />
+           )}
+        </div>
+
+      </div>
+    </MainLayout>
   );
 }
+
